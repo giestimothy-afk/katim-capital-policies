@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QBO Authorization — Katim Capital</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 3em auto; padding: 0 1.5em; color: #333; }
+    h2 { color: #2a7; }
+    p  { line-height: 1.5; }
+    .field  { margin: 1.5em 0; }
+    label   { display: block; font-weight: bold; margin-bottom: .4em; }
+    .value  { font-family: monospace; font-size: .95em; background: #f4f4f4;
+               padding: .6em 1em; border-radius: 4px; word-break: break-all; }
+    button  { margin-top: .5em; padding: .35em .9em; cursor: pointer; font-size: .9em; }
+    .error  { color: #c00; font-weight: bold; }
+    .note   { font-size: .85em; color: #666; margin-top: .3em; }
+  </style>
+</head>
+<body>
+  <h2>Authorization Successful</h2>
+  <p>Copy the values below and paste them into the terminal when prompted.</p>
+  <div id="fields"></div>
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var container = document.getElementById('fields');
+
+    if (!params.get('code')) {
+      var err = document.createElement('p');
+      err.className = 'error';
+      err.textContent = 'No authorization code found in the URL. Did Intuit redirect here correctly?';
+      container.appendChild(err);
+    } else {
+      var items = [
+        { label: 'Authorization Code', key: 'code',    note: 'Paste this when the terminal asks for the code.' },
+        { label: 'realmId',            key: 'realmId', note: 'Paste this when the terminal asks for the realmId.' },
+        { label: 'State',              key: 'state',   note: 'Verify this matches the expected state shown in the terminal.' },
+      ];
+
+      items.forEach(function(item) {
+        var val = params.get(item.key) || '(not present)';
+
+        var wrap  = document.createElement('div');  wrap.className = 'field';
+        var lbl   = document.createElement('label'); lbl.textContent = item.label;
+        var vdiv  = document.createElement('div');   vdiv.className = 'value'; vdiv.textContent = val;
+        var btn   = document.createElement('button'); btn.textContent = 'Copy';
+        btn.addEventListener('click', function() { navigator.clipboard.writeText(val); btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500); });
+        var note  = document.createElement('p');     note.className = 'note'; note.textContent = item.note;
+
+        wrap.appendChild(lbl);
+        wrap.appendChild(vdiv);
+        wrap.appendChild(btn);
+        wrap.appendChild(note);
+        container.appendChild(wrap);
+      });
+    }
+  </script>
+</body>
+</html>
